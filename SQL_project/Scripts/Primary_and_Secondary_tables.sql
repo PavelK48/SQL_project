@@ -22,7 +22,7 @@ CREATE OR REPLACE VIEW v_payrolls_draft AS
 	SELECT 
 		payroll_year AS `year`
 		,COALESCE (cpib.code, 'AVG') AS code  -- pro snadnější použití vyplním NULL ve sloupci code
-		,cpib.name AS category_code
+		,cpib.name AS category_name
 		,ROUND(AVG(cp.value), 2) AS value
 		,'payroll' AS description
 	FROM czechia_payroll cp
