@@ -1,0 +1,1 @@
+-- vytvoření tabulky SQL_primary:
