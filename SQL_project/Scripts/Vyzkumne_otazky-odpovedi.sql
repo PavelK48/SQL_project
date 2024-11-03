@@ -60,7 +60,7 @@ ON tpk.`year`=tpk2.`year`
 
 -- Výsledné řešení ukazuje sloupeček "result", který nám říká kolik litrů mléka a kilogramů chleba si můžeme v letech 2006 a 2018 koupit.
 
--- Varianta řešení č.2 za pomocí vnořeného selectu, ovšem není uplně přehledné. Mohlo by sloužit k případnému porovnání mezi těmito roky.
+-- Variantní řešení otázky č.2 za pomocí vnořeného selectu, ovšem není uplně přehledné. Mohlo by sloužit k případnému porovnání mezi těmito roky.
  SELECT `year`
 	, category_name
 	,value	
@@ -75,4 +75,25 @@ ON tpk.`year`=tpk2.`year`
 FROM t_pavel_kozak_project_sql_primary_final tpk
 WHERE `year` IN (2006,2018)
 	AND code IN ('114201', '111301')
+;
+
+
+
+-- 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální meziroční nárůst)?
+
+-- meziroční rozdíl cen:
+SELECT 
+	tpk2.`year`
+	,tpk2.category_name
+	,tpk2.value - tpk.value AS dif_in_CZK
+	,ROUND(((tpk2.value/tpk.value)-1)*100,2) AS dif_in_perc
+FROM t_pavel_kozak_project_sql_primary_final tpk
+JOIN t_pavel_kozak_project_sql_primary_final tpk2
+	ON tpk.`year`=tpk2.`year`-1
+	AND tpk.code = tpk2.code
+	AND tpk.description = 'price'
+--	AND tpk2.`year` = 2007
+--	AND tpk.category_name = 'Eidamská cihla'
+GROUP BY tpk2.category_name, tpk2.`year`
+-- ORDER BY tpk.category_name, tpk2.`year`
 ;
