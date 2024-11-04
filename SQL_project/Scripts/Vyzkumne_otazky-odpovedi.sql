@@ -81,7 +81,7 @@ WHERE `year` IN (2006,2018)
 
 -- 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální meziroční nárůst)?
 
--- meziroční rozdíl cen:
+-- pomocný krok, ve kterém vidím meziroční rozdíl cen v CZK a v procentech:
 SELECT 
 	tpk2.`year`
 	,tpk2.category_name
@@ -97,3 +97,39 @@ JOIN t_pavel_kozak_project_sql_primary_final tpk2
 GROUP BY tpk2.category_name, tpk2.`year`
 -- ORDER BY tpk.category_name, tpk2.`year`
 ;
+
+-- řešení za pomocí vytvořením VIEW: Rozdíl mezi zdražováním v první a posledním období zjistitím funkcí SUM na sečtení abs.hodnot (růst/pokles v CZK)
+
+CREATE OR REPLACE VIEW v_ukol_3 AS
+	SELECT 
+		tpk2.`year`
+		,tpk2.category_name
+		,tpk2.value - tpk.value AS dif_in_CZK
+		,ROUND(((tpk2.value/tpk.value)-1)*100,2) AS dif_in_perc
+	FROM t_pavel_kozak_project_sql_primary_final tpk
+	JOIN t_pavel_kozak_project_sql_primary_final tpk2
+		ON tpk.`year`=tpk2.`year`-1
+		AND tpk.code = tpk2.code
+		AND tpk.description = 'price'
+	GROUP BY tpk2.category_name, tpk2.`year`
+;
+
+SELECT 
+	vu.category_name
+--	,tp.value																-- ukazuje nám výchozí hodnotu (cena z roku 2006)
+--	,SUM (vu.dif_in_CZK) AS dif_sum_in_CZK									-- ukazuje nám rozdíl v ceně (mezi rokem 2006 a 2018)
+	,ROUND ((SUM (vu.dif_in_CZK)/tp.value)*100, 2) AS dif_in_percent
+FROM v_ukol_3 vu
+LEFT JOIN t_pavel_kozak_project_sql_primary_final tp
+	ON vu.category_name = tp.category_name
+	AND tp.`year`= 2006
+	AND description = 'price'
+GROUP BY category_name
+ORDER BY dif_in_percent
+;
+
+/* viz výsledek s využitím view (suma meziročních cenových rozdílů); 
+u cukru a rajčat se cena mezi léty 2006 a 2018 dokonce snížila, nejmenší zdražení nastalo u banánů (7,4%),
+největší zdražení u másla.
+*/
+
