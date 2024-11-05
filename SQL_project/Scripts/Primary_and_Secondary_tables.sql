@@ -21,7 +21,7 @@ CREATE OR REPLACE VIEW v_prices_draft AS
 CREATE OR REPLACE VIEW v_payrolls_draft AS
 	SELECT 
 		payroll_year AS `year`
-		,COALESCE (cpib.code, 'AVG') AS code  -- pro snadnější použití vyplním NULL ve sloupci code
+		,COALESCE (cpib.code, 'AVG') AS code  -- vyplním NULL ve sloupci code - slouží pro snadnější variantní výpočet s průměrnou hodnotou
 		,cpib.name AS category_name
 		,ROUND(AVG(cp.value), 2) AS value
 		,'payroll' AS description
@@ -88,8 +88,9 @@ GROUP BY YEAR
 ;
 
 
--- kapr živý - každoročně sezonní prodej, 19 záznamů, (dle mého názoru se jedná o relevantní údaj,
--- proto jej zahrnuji do finální tabulky)
+-- kapr živý - každoročně sezonní prodej, 19 záznamů -> tzn. v roce 2009 byl navíc zaznamenán kapr živý v měsíci listopadu.
+-- Ovšem v tabulce primary_final se tyto dvě hodnoty z průměrují na hodnotu 82,-CZK (dle mého názoru se jedná o relevantní údaj, 
+-- který neovlivňuje výsledky výzkumných otázek, proto jej zahrnuji do finální tabulky)
 SELECT 
 	ROUND (AVG(cp.value), 2) AS price
 	,category_code
@@ -174,8 +175,8 @@ FROM countries c
 WHERE continent = 'Europe'
 ;
 
--- vyberu data pomocí JOIN (data na continent Europe) a přes UNION sjednotím s vybranými daty jako je svět, EU, apod. 
--- Pro vytvoření tabulky omezím na společné roky 2006-2018 (stejně jako v tabulky primary_final).
+-- Vybírám data pomocí JOIN (data na continent Europe) a přes UNION sjednotím s vybranými daty jako je svět, EU, apod. 
+-- Pro vytvoření tabulky omezím na společné roky 2006-2018 (stejně jako v tabulce primary_final).
 
 CREATE OR REPLACE TABLE t_pavel_kozak_project_SQL_secondary_final AS
 	SELECT
@@ -200,5 +201,5 @@ CREATE OR REPLACE TABLE t_pavel_kozak_project_SQL_secondary_final AS
 ;
 
 SELECT *
-FROM t_pavel_kozak_project_sql_secondary_final tpk2
+FROM t_pavel_kozak_project_sql_secondary_final tsf
 ;
