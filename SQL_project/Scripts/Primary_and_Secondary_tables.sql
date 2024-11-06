@@ -133,7 +133,7 @@ WHERE cp.value_type_code = 5958
 GROUP BY industry_branch_code /*, payroll_year*/
 ;
 
--- ověření průměru mezd NULL vs odvětví - hodnoty se nerovnají. Předpokládám, že je chyba již ve zdrojových datech.
+-- ověření průměru mezd (NULL) vs průměr odvětví - hodnoty se nerovnají. Předpokládám, že je chyba již ve zdrojových datech.
 WITH average_payroll AS 
 			(SELECT 
 				ROUND (AVG (value),2) AS payroll
@@ -160,8 +160,8 @@ ON ap.payroll_year = an.payroll_year
 
 -- vytvoření tabulky SQL_secondary_final:
 
--- zjisťuji jaké oblasti zemí se vyskytují ve zdrojové tabulce, které by mne mohly zajímat? 
--- (mimo evropské země bych vybral Central Europe and the Baltics?, European Union, World?)
+-- zjisťuji jaké oblasti zemí se vyskytují ve zdrojové tabulce 
+-- (mimo evropské země bych vybral Central Europe and the Baltics, European Union, World)
 SELECT DISTINCT
 country
 FROM economies e

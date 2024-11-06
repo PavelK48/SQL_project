@@ -18,6 +18,7 @@ SELECT
 	,ROUND (diff, 0) AS decrease_amount
 FROM quest1_final
 WHERE diff < 0
+ORDER BY decrease_amount
 ;
 
 /*Výsledek nám dává roky a odvětví, v kterých mzda poklesla.
